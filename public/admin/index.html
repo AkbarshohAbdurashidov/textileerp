@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TextileERP — Admin Panel</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">
+        <div class="logo-icon">👔</div>
+        <div>
+          <div class="logo-text">TextileERP</div>
+          <div class="logo-sub">v2.1 · Admin Panel</div>
+        </div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Asosiy</div>
+      <div class="nav-item active" onclick="navigate('dashboard')"><span class="icon"><i data-lucide="layout-dashboard"></i></span> Dashboard</div>
+      <div class="nav-section">Boshqaruv</div>
+      <div class="nav-item" onclick="navigate('products')"><span class="icon"><i data-lucide="shirt"></i></span> Mahsulotlar</div>
+      <div class="nav-item" onclick="navigate('customers')"><span class="icon"><i data-lucide="users"></i></span> Mijozlar</div>
+      <div class="nav-item" onclick="navigate('orders')"><span class="icon"><i data-lucide="package"></i></span> Buyurtmalar <span
+          class="nav-badge" id="pending-badge">0</span></div>
+      <div class="nav-item" onclick="navigate('reports')"><span class="icon"><i data-lucide="bar-chart-2"></i></span> Hisobotlar</div>
+      <div class="nav-section">Tizim</div>
+      <div class="nav-item" onclick="navigate('cloud')"><span class="icon"><i data-lucide="cloud"></i></span> Cloud Arxitektura</div>
+      <div class="nav-item" onclick="navigate('settings')"><span class="icon"><i data-lucide="settings"></i></span> Sozlamalar</div>
+      <div class="nav-section">Havolalar</div>
+      <div class="nav-item" onclick="window.open('/market','_blank')"><span class="icon"><i data-lucide="store"></i></span> Bozorni ko'rish
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar">AK</div>
+        <div>
+          <div class="user-name">Akbarshoh Abdurashidov</div>
+          <div class="user-role">IT Admin</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="topbar">
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-actions">
+          <span class="text-muted" id="current-time" style="font-family:var(--mono);font-size:12px;"></span>
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);">
+          </div>
+          <span style="font-size:12px;color:var(--green);font-weight:600;">Tizim Aktiv</span>
+        </div>
+      </div>
+      <div style="padding:28px;">
+        <div class="grid-4">
+          <div class="card stat-card">
+            <div class="stat-icon"><i data-lucide="trending-up"></i></div>
+            <div class="stat-label">Oylik Daromad</div>
+            <div class="stat-value" id="stat-revenue">0</div>
+            <div class="stat-sub">UZS</div>
+            <span class="stat-change up">↑ 12.4%</span>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon"><i data-lucide="package"></i></div>
+            <div class="stat-label">Jami Buyurtmalar</div>
+            <div class="stat-value" id="stat-orders">0</div>
+            <div class="stat-sub">bu oy</div>
+            <span class="stat-change up">↑ 8.1%</span>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon"><i data-lucide="users"></i></div>
+            <div class="stat-label">Faol Mijozlar</div>
+            <div class="stat-value" id="stat-customers">0</div>
+            <div class="stat-sub">jami bazada</div>
+            <span class="stat-change up">↑ 5.2%</span>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon"><i data-lucide="shirt"></i></div>
+            <div class="stat-label">Mahsulot SKU</div>
+            <div class="stat-value" id="stat-products">0</div>
+            <div class="stat-sub">omborxonada</div>
+            <span class="stat-change down">↓ 2 past zaxira</span>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="table-title" style="margin-bottom:4px;">Haftalik Sotuv Grafigi</div>
+            <div class="text-muted">So'm miqdorida (millionlarda)</div>
+            <div class="chart-bar-wrap" id="sales-chart"></div>
+          </div>
+          <div class="card">
+            <div class="table-title" style="margin-bottom:16px;">So'nggi Buyurtmalar</div>
+            <div id="recent-orders-list"></div>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="table-title" style="margin-bottom:12px;">☁️ Cloud Holati</div>
+            <div class="detail-row"><span class="detail-key">VPC Status</span><span><span
+                  class="dot dot-green"></span>Aktiv</span></div>
+            <div class="detail-row"><span class="detail-key">Load Balancer</span><span id="cs-lb"><span
+                  class="dot dot-green"></span>Ishlayapti</span></div>
+            <div class="detail-row"><span class="detail-key">Auto-Scaling</span><span><span
+                  class="dot dot-green"></span><span id="cs-instances">2/10</span> instance</span></div>
+            <div class="detail-row"><span class="detail-key">VPN Tunnel</span><span><span
+                  class="dot dot-green"></span>Ulangan</span></div>
+            <div class="detail-row"><span class="detail-key">Server Uptime</span><span
+                style="color:var(--green);font-weight:600;" id="cs-uptime">—</span></div>
+          </div>
+          <div class="card">
+            <div class="table-title" style="margin-bottom:12px;">📊 Kategoriya Bo'yicha</div>
+            <div id="category-stats"></div>
+          </div>
+          <div class="card">
+            <div class="table-title" style="margin-bottom:12px;">⚡ Tezkor Amallar</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <button class="btn btn-primary" onclick="navigate('orders');openModal('order-modal')"
+                style="text-align:left;">+ Yangi Buyurtma</button>
+              <button class="btn btn-ghost" onclick="navigate('products');openModal('product-modal')"
+                style="text-align:left;">+ Mahsulot Qo'shish</button>
+              <button class="btn btn-ghost" onclick="navigate('customers');openModal('customer-modal')"
+                style="text-align:left;">+ Mijoz Qo'shish</button>
+              <button class="btn btn-ghost" onclick="navigate('reports')" style="text-align:left;">📄 Hisobot
+                Yuklash</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div id="page-products" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Mahsulotlar</div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" onclick="exportData('products')">⬇ Export</button>
+          <button class="btn btn-primary" onclick="openModal('product-modal')">+ Mahsulot Qo'shish</button>
+        </div>
+      </div>
+      <div style="padding:28px;">
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title">Mahsulotlar Ro'yxati</span>
+            <input class="search-box" type="text" placeholder="🔍  Mahsulot qidirish..."
+              oninput="filterTable('products-tbody', this.value)">
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Mahsulot Nomi</th>
+                <th>Kategoriya</th>
+                <th>Narx (UZS)</th>
+                <th>Zaxira</th>
+                <th>Holat</th>
+                <th>Amallar</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div id="page-customers" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Mijozlar (CRM)</div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" onclick="exportData('customers')">⬇ Export</button>
+          <button class="btn btn-primary" onclick="openModal('customer-modal')">+ Mijoz Qo'shish</button>
+        </div>
+      </div>
+      <div style="padding:28px;">
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title">Mijozlar Bazasi</span>
+            <input class="search-box" type="text" placeholder="🔍  Mijoz qidirish..."
+              oninput="filterTable('customers-tbody', this.value)">
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ism Familiya</th>
+                <th>Kompaniya</th>
+                <th>Telefon</th>
+                <th>Shahar</th>
+                <th>Jami Xarid</th>
+                <th>Daraja</th>
+                <th>Amallar</th>
+              </tr>
+            </thead>
+            <tbody id="customers-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div id="page-orders" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Buyurtmalar (WMS)</div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" onclick="exportData('orders')">⬇ Export</button>
+          <button class="btn btn-primary" onclick="openModal('order-modal')">+ Buyurtma Qo'shish</button>
+        </div>
+      </div>
+      <div style="padding:28px;">
+        <div class="grid-4" style="margin-bottom:20px;">
+          <div class="card" style="padding:14px 18px;">
+            <div class="stat-label">Yangi</div>
+            <div class="stat-value" style="font-size:22px;" id="ord-new">0</div>
+          </div>
+          <div class="card" style="padding:14px 18px;">
+            <div class="stat-label">Jarayonda</div>
+            <div class="stat-value" style="font-size:22px;color:var(--yellow);" id="ord-proc">0</div>
+          </div>
+          <div class="card" style="padding:14px 18px;">
+            <div class="stat-label">Yetkazildi</div>
+            <div class="stat-value" style="font-size:22px;color:var(--green);" id="ord-done">0</div>
+          </div>
+          <div class="card" style="padding:14px 18px;">
+            <div class="stat-label">Bekor qilindi</div>
+            <div class="stat-value" style="font-size:22px;color:var(--red);" id="ord-cancel">0</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title">Buyurtmalar Ro'yxati</span>
+            <input class="search-box" type="text" placeholder="🔍  Buyurtma qidirish..."
+              oninput="filterTable('orders-tbody', this.value)">
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Mijoz</th>
+                <th>Mahsulot</th>
+                <th>Miqdor</th>
+                <th>Summa</th>
+                <th>Sana</th>
+                <th>Holat</th>
+                <th>Amallar</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="page-reports" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Hisobotlar va Tahlil</div>
+        <div class="topbar-actions">
+          <button class="btn btn-primary" onclick="generateReport()">📄 Hisobot Yaratish</button>
+        </div>
+      </div>
+      <div style="padding:28px;">
+        <div class="grid-3">
+          <div class="card">
+            <div class="table-title" style="margin-bottom:12px;">💰 Moliyaviy Xulosa</div>
+            <div id="financial-report"></div>
+          </div>
+          <div class="card">
+            <div class="table-title" style="margin-bottom:12px;">🏆 Top Mahsulotlar</div>
+            <div id="top-products-report"></div>
+          </div>
+          <div class="card">
+            <div class="table-title" style="margin-bottom:12px;">👥 Top Mijozlar</div>
+            <div id="top-customers-report"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-title" style="margin-bottom:4px;">📊 Oylik Sotuv Tendensiyasi</div>
+          <div class="text-muted" style="margin-bottom:16px;">So'm miqdorida (millionlarda) — so'nggi 8 oy</div>
+          <div class="chart-bar-wrap" id="monthly-chart" style="height:160px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLOUD ARCHITECTURE -->
+    <div id="page-cloud" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Cloud Tarmoq Arxitekturasi</div>
+        <div class="topbar-actions">
+          <span style="font-size:12px;color:var(--muted);font-family:var(--mono);">Yangilanish: <span
+              id="cloud-last-update">—</span></span>
+          <div id="cloud-live-dot"
+            style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);">
+          </div>
+          <span style="font-size:12px;color:var(--green);font-weight:600;">Live</span>
+        </div>
+      </div>
+      <div style="padding:28px;">
+        <div class="cloud-diagram">
+          <div class="diagram-title">AWS Cloud Tarmoq Diagrammasi — VPC 10.0.0.0/16</div>
+          <div class="arch-grid">
+            <div class="arch-node" style="border-color:var(--accent);background:rgba(79,124,255,.05);">
+              <div class="n-icon">🏢</div>
+              <div class="n-label">Bosh Ofis</div>
+              <div class="n-sub">192.168.1.0/24</div>
+            </div>
+            <div class="arch-arrow">⟺</div>
+            <div class="arch-node" style="border-color:var(--yellow);background:rgba(245,158,11,.05);">
+              <div class="n-icon">🔐</div>
+              <div class="n-label">Site-to-Site VPN</div>
+              <div class="n-sub">IPsec/IKEv2</div>
+            </div>
+            <div class="arch-arrow">⟺</div>
+            <div class="arch-node" style="border-color:var(--green);background:rgba(34,197,94,.05);">
+              <div class="n-icon">🌐</div>
+              <div class="n-label">Internet Gateway</div>
+              <div class="n-sub">AWS IGW</div>
+            </div>
+          </div>
+          <div style="margin:20px 0;border-top:1px dashed var(--border);"></div>
+          <div style="background:rgba(79,124,255,.04);border:1px dashed var(--accent);border-radius:12px;padding:16px;">
+            <div
+              style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px;">
+              🔵 AWS VPC — 10.0.0.0/16 (eu-west-1)</div>
+            <div style="display:grid;grid-template-columns:1fr 2px 1fr;gap:16px;">
+              <div
+                style="background:rgba(34,197,94,.04);border:1px dashed rgba(34,197,94,.3);border-radius:8px;padding:14px;">
+                <div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:10px;">PUBLIC SUBNET —
+                  10.0.1.0/24</div>
+                <div class="arch-grid" style="grid-template-columns:1fr 1fr;gap:8px;">
+                  <div class="arch-node" style="padding:10px;">
+                    <div class="n-icon" style="font-size:18px;">⚖️</div>
+                    <div class="n-label" style="font-size:10px;">Load Balancer</div>
+                  </div>
+                  <div class="arch-node" style="padding:10px;">
+                    <div class="n-icon" style="font-size:18px;">🔀</div>
+                    <div class="n-label" style="font-size:10px;">NAT Gateway</div>
+                  </div>
+                </div>
+              </div>
+              <div style="background:var(--border);width:1px;"></div>
+              <div
+                style="background:rgba(239,68,68,.04);border:1px dashed rgba(239,68,68,.3);border-radius:8px;padding:14px;">
+                <div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:10px;">PRIVATE SUBNET —
+                  10.0.2.0/24</div>
+                <div class="arch-grid" style="grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                  <div class="arch-node" style="padding:10px;">
+                    <div class="n-icon" style="font-size:18px;">🗂️</div>
+                    <div class="n-label" style="font-size:10px;">ERP Server</div>
+                  </div>
+                  <div class="arch-node" style="padding:10px;">
+                    <div class="n-icon" style="font-size:18px;">💬</div>
+                    <div class="n-label" style="font-size:10px;">CRM Server</div>
+                  </div>
+                  <div class="arch-node" style="padding:10px;">
+                    <div class="n-icon" style="font-size:18px;">📦</div>
+                    <div class="n-label" style="font-size:10px;">WMS Server</div>
+                  </div>
+                </div>
+                <div style="margin-top:8px;">
+                  <div class="arch-node" style="padding:10px;">
+                    <div class="n-icon" style="font-size:18px;">🗄️</div>
+                    <div class="n-label" style="font-size:10px;">RDS Database — 10.0.3.0/24</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="table-title" style="margin-bottom:12px;">🔧 Tarmoq Sozlamalari</div>
+            <div class="detail-row"><span class="detail-key">VPC CIDR</span><span class="tag">10.0.0.0/16</span></div>
+            <div class="detail-row"><span class="detail-key">Public Subnet</span><span class="tag">10.0.1.0/24</span>
+            </div>
+            <div class="detail-row"><span class="detail-key">Private Subnet</span><span class="tag">10.0.2.0/24</span>
+            </div>
+            <div class="detail-row"><span class="detail-key">DB Subnet</span><span class="tag">10.0.3.0/24</span></div>
+            <div class="detail-row"><span class="detail-key">Region</span><span class="tag">eu-west-1</span></div>
+          </div>
+          <div class="card">
+            <div class="table-title" style="margin-bottom:12px;">⚡ Real-Time Metrikalar</div>
+            <div class="detail-row"><span class="detail-key">Joriy Instancelar</span><span
+                style="color:var(--green);font-weight:600;" id="cs-inst-count">2 aktiv</span></div>
+            <div class="detail-row"><span class="detail-key">Min / Maks</span><span>2 / 10</span></div>
+            <div class="detail-row"><span class="detail-key">Network IN</span><span
+                style="font-family:var(--mono);font-size:12px;" id="cs-net-in">— Kbps</span></div>
+            <div class="detail-row"><span class="detail-key">Network OUT</span><span
+                style="font-family:var(--mono);font-size:12px;" id="cs-net-out">— Kbps</span></div>
+            <div style="margin-top:12px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span class="text-muted" style="font-size:11px;">CPU Foydalanish</span>
+                <span style="font-size:11px;font-weight:600;font-family:var(--mono);" id="cs-cpu-pct">—%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="cs-cpu-bar" style="width:0%;transition:width .8s;"></div>
+              </div>
+              <div style="margin-top:10px;display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span class="text-muted" style="font-size:11px;">RAM Foydalanish</span>
+                <span style="font-size:11px;font-weight:600;font-family:var(--mono);" id="cs-mem-pct">—%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="cs-mem-bar"
+                  style="width:0%;transition:width .8s;background:var(--accent2);"></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:6px;" id="cs-mem-detail">—</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-title" style="margin-bottom:12px;">🛡️ Servis Holatlari</div>
+            <div class="detail-row"><span class="detail-key">ERP Server</span><span id="cs-svc-erp"><span
+                  class="dot dot-green"></span><span class="badge badge-green">Online</span></span></div>
+            <div class="detail-row"><span class="detail-key">CRM Server</span><span id="cs-svc-crm"><span
+                  class="dot dot-green"></span><span class="badge badge-green">Online</span></span></div>
+            <div class="detail-row"><span class="detail-key">WMS Server</span><span id="cs-svc-wms"><span
+                  class="dot dot-green"></span><span class="badge badge-green">Online</span></span></div>
+            <div class="detail-row"><span class="detail-key">RDS Database</span><span id="cs-svc-db"><span
+                  class="dot dot-green"></span><span class="badge badge-green">Online</span></span></div>
+            <div class="detail-row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+              <span class="detail-key">Yangi Buyurtmalar</span>
+              <span style="font-weight:700;color:var(--yellow);font-size:16px;" id="cs-new-orders">—</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Jami Mahsulotlar</span>
+              <span style="font-weight:700;" id="cs-total-products">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="page-settings" class="page">
+      <div class="topbar">
+        <div class="topbar-title">Tizim Sozlamalari</div>
+      </div>
+      <div style="padding:28px;">
+        <div class="grid-2">
+          <div class="card">
+            <div class="table-title" style="margin-bottom:16px;">🏢 Kompaniya Ma'lumotlari</div>
+            <div class="form-group"><label class="form-label">Kompaniya nomi</label><input class="form-input"
+                value="Fashion Wholesale Ltd."></div>
+            <div class="form-group"><label class="form-label">Manzil</label><input class="form-input"
+                value="Toshkent, Mirzo Ulug'bek tumani"></div>
+            <div class="form-group"><label class="form-label">INN</label><input class="form-input" value="123456789">
+            </div>
+            <button class="btn btn-primary">Saqlash</button>
+          </div>
+          <div class="card">
+            <div class="table-title" style="margin-bottom:16px;">☁️ Cloud Ulanish</div>
+            <div class="form-group"><label class="form-label">AWS Region</label><input class="form-input"
+                value="eu-west-1 (Ireland)" readonly></div>
+            <div class="form-group"><label class="form-label">VPC ID</label><input class="form-input"
+                value="vpc-0a1b2c3d4e5f" readonly style="font-family:var(--mono);font-size:12px;"></div>
+            <div class="form-group"><label class="form-label">API Endpoint</label><input class="form-input"
+                value="https://api.fashionwholesale.com" readonly style="font-family:var(--mono);font-size:12px;"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+              <div class="dot dot-green" style="box-shadow:0 0 6px var(--green);"></div>
+              <span style="font-size:13px;color:var(--green);font-weight:600;">Cloud ulanish aktiv</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODALS -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal">
+      <div class="modal-title">Yangi Mahsulot Qo'shish</div>
+      <div class="form-group"><label class="form-label">Mahsulot Nomi</label><input class="form-input" id="p-name"
+          placeholder="Masalan: Ko'k Jinsi Shimlar"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Kategoriya</label>
+          <select class="form-input" id="p-cat">
+            <option>Ko'ylak</option>
+            <option>Shim</option>
+            <option>Kurtka</option>
+            <option>Palto</option>
+            <option>Sport kiyim</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">SKU</label><input class="form-input" id="p-sku"
+            placeholder="SKU-0001"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Narx (UZS)</label><input class="form-input" id="p-price"
+            type="number" placeholder="150000"></div>
+        <div class="form-group"><label class="form-label">Zaxira (dona)</label><input class="form-input" id="p-stock"
+            type="number" placeholder="100"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rasm URL (Unsplash yoki boshqa link)</label>
+        <input class="form-input" id="p-image" placeholder="https://images.unsplash.com/..." oninput="previewImage()">
+        <div class="img-preview-wrap" id="p-preview-wrap">
+          <img id="p-preview-img" src="" alt="Preview" onerror="document.getElementById('p-preview-wrap').style.display='none'">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('product-modal')">Bekor</button>
+        <button class="btn btn-primary" onclick="addProduct()">Qo'shish</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="customer-modal">
+    <div class="modal">
+      <div class="modal-title">Yangi Mijoz Qo'shish</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Ism</label><input class="form-input" id="c-name"
+            placeholder="Ism Familiya"></div>
+        <div class="form-group"><label class="form-label">Kompaniya</label><input class="form-input" id="c-company"
+            placeholder="Kompaniya nomi"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Telefon</label><input class="form-input" id="c-phone"
+            placeholder="+998 90 123 45 67"></div>
+        <div class="form-group"><label class="form-label">Shahar</label><input class="form-input" id="c-city"
+            placeholder="Toshkent"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('customer-modal')">Bekor</button>
+        <button class="btn btn-primary" onclick="addCustomer()">Qo'shish</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="order-modal">
+    <div class="modal">
+      <div class="modal-title">Yangi Buyurtma</div>
+      <div class="form-group"><label class="form-label">Mijoz</label><select class="form-input"
+          id="o-customer"></select></div>
+      <div class="form-group"><label class="form-label">Mahsulot</label><select class="form-input"
+          id="o-product"></select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Miqdor</label><input class="form-input" id="o-qty"
+            type="number" placeholder="1" min="1"></div>
+        <div class="form-group"><label class="form-label">Holat</label>
+          <select class="form-input" id="o-status">
+            <option value="yangi">Yangi</option>
+            <option value="jarayonda">Jarayonda</option>
+            <option value="yetkazildi">Yetkazildi</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('order-modal')">Bekor</button>
+        <button class="btn btn-primary" onclick="addOrder()">Yaratish</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">✅ <span id="toast-msg">Saqlandi</span></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/crud.js"></script>
+  <script src="js/modals.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
